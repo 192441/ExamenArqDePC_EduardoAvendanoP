@@ -1,51 +1,85 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: EC2 Examen Arquitectura de Computadores
+Description: EC2 con Security Group y pagina web para examen
 
 Resources:
 
-  SecurityGroupEC2:
+  MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable HTTP access
+      GroupDescription: Permitir acceso HTTP
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
 
-  EC2Instance:
+  MyEC2:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0c02fb55956c7d316   # Amazon Linux 2 (us-east-1)
+      ImageId: ami-0c02fb55956c7d316
       InstanceType: t2.micro
-      SecurityGroups:
-        - !Ref SecurityGroupEC2
+
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
           yum update -y
           yum install -y httpd
-          systemctl start httpd
           systemctl enable httpd
+          systemctl start httpd
 
           cat <<EOF > /var/www/html/index.html
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Examen Final</title>
-            <style>
-              body { font-family: Arial; text-align: center; background-color: #f0f0f0; }
-              h1 { color: #2c3e50; }
-              p { font-size: 18px; }
-            </style>
+              <title>Examen Final</title>
+              <style>
+                  body {
+                      font-family: Arial;
+                      text-align: center;
+                      background-color: #f2f2f2;
+                      margin-top: 50px;
+                  }
+                  h1 {
+                      color: #2c3e50;
+                  }
+                  .box {
+                      background: white;
+                      padding: 20px;
+                      width: 50%;
+                      margin: auto;
+                      border-radius: 10px;
+                      box-shadow: 0px 0px 10px #ccc;
+                  }
+              </style>
           </head>
           <body>
-            <h1>Examen Final Arquitectura de Computadores</h1>
-            <p><b>Nombre:</b> Eduardo Avendaño Pérez</p>
-            <p><b>Código:</b> 0192441</p>
-            <script>
-              console.log("Página desplegada correctamente");
-            </script>
+
+              <div class="box">
+                  <h1>Examen Final Arquitectura de Computadores</h1>
+
+                  <p><b>Nombre completo:</b> Eduardo Avendaño Pérez</p>
+                  <p><b>Código estudiantil:</b> 0192441</p>
+
+                  <button onclick="mostrar()">Click JS</button>
+
+                  <p id="msg"></p>
+              </div>
+
+              <script>
+                  function mostrar() {
+                      document.getElementById("msg").innerHTML =
+                      "EC2 desplegada correctamente con AWS CloudFormation 🚀";
+                  }
+              </script>
+
           </body>
           </html>
           EOF
+
+Outputs:
+  PublicIP:
+    Description: IP publica de la EC2
+    Value: !GetAtt MyEC2.PublicIp
