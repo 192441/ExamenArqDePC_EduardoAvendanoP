@@ -37,4 +37,4 @@ El template despliega:
 * Una instancia Amazon Linux.
 * Security Group con puerto 80 habilitado.
 * UserData para instalar Apache.
-* Página web personalizada con HTML, CSS y JavaScript.
+* Página web personalizada con HTML, CSS y JavaScript.....
