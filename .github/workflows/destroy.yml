@@ -9,22 +9,24 @@ jobs:
 
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Delete Stack
+      - name: Check if stack exists
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name ec2-stack-clase || echo "Stack no existe"
+
+      - name: Delete CloudFormation Stack
         run: |
           aws cloudformation delete-stack \
-          --stack-name examen-arqpc-stack
+            --stack-name ec2-stack-clase
 
-      - name: Wait Delete
+      - name: Wait for deletion to complete
         run: |
           aws cloudformation wait stack-delete-complete \
-          --stack-name examen-arqpc-stack
+            --stack-name ec2-stack-clase || echo "Stack ya eliminado"
