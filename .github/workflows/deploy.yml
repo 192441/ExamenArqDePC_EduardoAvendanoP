@@ -4,13 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -21,8 +18,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Validate CloudFormation template
+        run: |
+          aws cloudformation validate-template \
+          --template-body file://template/ec2.yaml
+
       - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
           --template-file template/ec2.yaml \
-          --stack-name ec2-stack-clase
+          --stack-name ec2-stack-clase \
+          --capabilities CAPABILITY_NAMED_IAM

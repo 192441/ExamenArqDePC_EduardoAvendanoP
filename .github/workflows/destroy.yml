@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -16,17 +15,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Check if stack exists
-        run: |
-          aws cloudformation describe-stacks \
-            --stack-name ec2-stack-clase || echo "Stack no existe"
-
       - name: Delete CloudFormation Stack
         run: |
           aws cloudformation delete-stack \
-            --stack-name ec2-stack-clase
+          --stack-name ec2-stack-clase
 
-      - name: Wait for deletion to complete
+      - name: Wait for stack deletion
         run: |
           aws cloudformation wait stack-delete-complete \
-            --stack-name ec2-stack-clase || echo "Stack ya eliminado"
+          --stack-name ec2-stack-clase
