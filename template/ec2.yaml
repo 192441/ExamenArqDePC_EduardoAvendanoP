@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Examen Final Arquitectura de Computadores
+
+Resources:
+
+WebSecurityGroup:
+Type: AWS::EC2::SecurityGroup
+Properties:
+GroupDescription: Permitir acceso HTTP
+SecurityGroupIngress:
+- IpProtocol: tcp
+FromPort: 80
+ToPort: 80
+CidrIp: 0.0.0.0/0
+
+WebServer:
+Type: AWS::EC2::Instance
+Properties:
+InstanceType: t2.micro
+
+```
+  # Amazon Linux 2 (ajustar según la región utilizada)
+  ImageId: ami-0c02fb55956c7d316
+
+  SecurityGroupIds:
+    - !Ref WebSecurityGroup
+
+  UserData:
+    Fn::Base64: |
+      #!/bin/bash
+      yum update -y
+      yum install -y httpd
+
+      systemctl enable httpd
+      systemctl start httpd
+
+      cat > /var/www/html/index.html << 'EOF'
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Examen Final Arquitectura de Computadores</title>
+
+          <style>
+              body{
+                  margin:0;
+                  font-family: Arial, sans-serif;
+                  background:#0f172a;
+                  color:white;
+                  display:flex;
+                  justify-content:center;
+                  align-items:center;
+                  height:100vh;
+              }
+
+              .card{
+                  background:#1e293b;
+                  padding:40px;
+                  border-radius:15px;
+                  text-align:center;
+                  box-shadow:0 0 15px rgba(0,0,0,0.4);
+              }
+
+              h1{
+                  color:#38bdf8;
+              }
+
+              h2{
+                  color:#f8fafc;
+              }
+
+              p{
+                  font-size:20px;
+              }
+          </style>
+      </head>
+
+      <body>
+
+          <div class="card">
+
+              <h1>Examen Final Arquitectura de Computadores</h1>
+
+              <h2>Nombre completo: Eduardo Avendaño Pérez</h2>
+
+              <h2>Código estudiantil: 0192441</h2>
+
+              <p>Examen Final Arquitectura de Computadores</p>
+
+              <button onclick="mostrarMensaje()">
+                  Mostrar Mensaje
+              </button>
+
+              <p id="mensaje"></p>
+
+          </div>
+
+          <script>
+              function mostrarMensaje(){
+                  document.getElementById("mensaje").innerHTML =
+                  "Página desplegada mediante AWS CloudFormation y GitHub Actions";
+              }
+          </script>
+
+      </body>
+      </html>
+      EOF
+```
+
+Outputs:
+
+InstancePublicIP:
+Description: IP Pública de la instancia EC2
+Value: !GetAtt WebServer.PublicIp
