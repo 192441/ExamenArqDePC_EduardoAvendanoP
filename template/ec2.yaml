@@ -1,82 +1,49 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: EC2 con página web (HTML + CSS + JS) para examen final
+UserData:
+  Fn::Base64: |
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl enable httpd
+    systemctl start httpd
 
-Resources:
+    cat <<EOF > /var/www/html/index.html
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Examen Final</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: #0f172a;
+                color: white;
+                text-align: center;
+                padding-top: 50px;
+            }
+            .card {
+                background: #1e293b;
+                padding: 20px;
+                border-radius: 15px;
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>Examen Final Arquitectura de Computadores</h1>
+            <h2>Nombre: Eduardo Avendaño Perez</h2>
+            <h3>Código: 0192441</h3>
 
-  MySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Permitir HTTP y SSH
-      SecurityGroupIngress:
+            <button onclick="mostrar()">Click aquí</button>
+            <p id="msg"></p>
+        </div>
 
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-
-  MyEC2:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: ami-0cca150d127c2216f
-      InstanceType: t3.micro
-
-      SecurityGroupIds:
-        - !Ref MySecurityGroup
-
-      UserData:
-        Fn::Base64: |
-          #!/bin/bash
-          yum update -y
-          yum install -y httpd
-          systemctl enable httpd
-          systemctl start httpd
-
-          cat <<EOF > /var/www/html/index.html
-          <!DOCTYPE html>
-          <html lang="es">
-          <head>
-              <meta charset="UTF-8">
-              <title>Examen Final</title>
-              <style>
-                  body {
-                      font-family: Arial;
-                      background: #0f172a;
-                      color: white;
-                      text-align: center;
-                      padding-top: 50px;
-                  }
-                  .card {
-                      background: #1e293b;
-                      padding: 20px;
-                      border-radius: 15px;
-                      display: inline-block;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="card">
-                  <h1>Examen Final Arquitectura de Computadores</h1>
-                  <h2>Nombre: TU NOMBRE COMPLETO</h2>
-                  <h3>Código: TU CÓDIGO ESTUDIANTIL</h3>
-                  <button onclick="mostrar()">Click aquí</button>
-                  <p id="msg"></p>
-              </div>
-
-              <script>
-                  function mostrar() {
-                      document.getElementById("msg").innerText =
-                      "Despliegue en AWS funcionando correctamente 🚀";
-                  }
-              </script>
-          </body>
-          </html>
-          EOF
-
-Outputs:
-  PublicIP:
-    Value: !GetAtt MyEC2.PublicIp
+        <script>
+            function mostrar() {
+                document.getElementById("msg").innerText =
+                "Despliegue en AWS funcionando correctamente 🚀";
+            }
+        </script>
+    </body>
+    </html>
+    EOF
